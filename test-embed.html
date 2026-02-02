@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Embed Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+        button {
+            padding: 10px 20px;
+            background: #3ea6ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2d8fd8;
+        }
+    </style>
+</head>
+<body>
+    <h1>YouTube Embedding Test</h1>
+    
+    <div class="test-container">
+        <h2>Test 1: Direct Embed (Should work immediately)</h2>
+        <iframe 
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 2: Load on Button Click</h2>
+        <button onclick="loadVideo()">Click to Load Video</button>
+        <div id="video-container" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 3: Toggle Video (Like your app)</h2>
+        <div style="position: relative; padding-bottom: 56.25%; background: #000; cursor: pointer;" onclick="toggleTestPlayer()">
+            <img id="test-thumb" src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" 
+                 style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+            <div id="test-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255,0,0,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <div style="width: 0; height: 0; border-left: 20px solid white; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 4px;"></div>
+            </div>
+            <iframe id="test-player" src="" 
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        function loadVideo() {
+            document.getElementById('video-container').innerHTML = `
+                <iframe 
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" 
+                    style="width: 100%; height: 400px;"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            `;
+        }
+
+        function toggleTestPlayer() {
+            const player = document.getElementById('test-player');
+            const thumb = document.getElementById('test-thumb');
+            const overlay = document.getElementById('test-overlay');
+            
+            console.log('Toggle clicked');
+            console.log('Current player src:', player.src);
+            
+            if (!player.src || player.src === '' || player.src === window.location.href) {
+                console.log('Setting video src...');
+                player.src = 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1';
+                player.style.display = 'block';
+                thumb.style.display = 'none';
+                overlay.style.display = 'none';
+                console.log('Video should now be playing');
+            }
+        }
+    </script>
+</body>
+</html>
