@@ -210,6 +210,7 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
+            z-index: 5;
         }
 
         .play-icon {
@@ -228,6 +229,7 @@
             width: 100%;
             height: 100%;
             display: none;
+            z-index: 10;
         }
 
         .video-player.active {
@@ -318,8 +320,11 @@
             </div>
             <form id="addVideoForm">
                 <div class="form-group">
-                    <label for="videoUrl">YouTube URL *</label>
-                    <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+                    <label for="videoUrl">YouTube URL or Embed Code *</label>
+                    <input type="text" id="videoUrl" placeholder="Paste share URL or embed code..." required>
+                    <small style="color: #888; font-size: 12px; display: block; margin-top: 4px;">
+                        Accepts: Share URL, Watch URL, or full iframe embed code
+                    </small>
                 </div>
                 <div class="form-group">
                     <label for="videoTitle">Title (optional)</label>
@@ -346,11 +351,44 @@
         const videoFeed = document.getElementById('videoFeed');
         const searchInput = document.getElementById('searchInput');
 
-        // Extract video ID from YouTube URL
-        function extractVideoId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
+        // Extract video ID from YouTube URL or embed code
+        function extractVideoId(input) {
+            // Handle iframe embed code
+            if (input.includes('<iframe') || input.includes('embed')) {
+                const embedMatch = input.match(/(?:embed\/|\/embed\/)([a-zA-Z0-9_-]{11})/);
+                if (embedMatch) return embedMatch[1];
+            }
+            
+            // Handle youtu.be share links
+            if (input.includes('youtu.be/')) {
+                const shareMatch = input.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+                if (shareMatch) return shareMatch[1];
+            }
+            
+            // Handle youtube.com/watch URLs
+            if (input.includes('youtube.com/watch')) {
+                const urlParams = new URLSearchParams(input.split('?')[1]);
+                const videoId = urlParams.get('v');
+                if (videoId && videoId.length === 11) return videoId;
+            }
+            
+            // Handle youtube.com/embed URLs
+            if (input.includes('youtube.com/embed/')) {
+                const embedMatch = input.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/);
+                if (embedMatch) return embedMatch[1];
+            }
+            
+            // Handle shorts
+            if (input.includes('youtube.com/shorts/')) {
+                const shortsMatch = input.match(/shorts\/([a-zA-Z0-9_-]{11})/);
+                if (shortsMatch) return shortsMatch[1];
+            }
+            
+            // Fallback: try to find any 11-character video ID pattern
+            const generalMatch = input.match(/([a-zA-Z0-9_-]{11})/);
+            if (generalMatch) return generalMatch[1];
+            
+            return null;
         }
 
         // Get video title from YouTube (using oEmbed API)
@@ -389,8 +427,10 @@
                         <iframe class="video-player" 
                                 id="player-${index}"
                                 src="" 
+                                title="YouTube video player"
                                 frameborder="0" 
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin"
                                 allowfullscreen>
                         </iframe>
                     </div>
@@ -416,10 +456,22 @@
                 // Find the actual video in current rendered list
                 const actualVideo = videos.find(v => v.id === card.dataset.videoId);
                 if (actualVideo) {
-                    player.src = `https://www.youtube.com/embed/${actualVideo.id}?autoplay=1&enablejsapi=1`;
+                    // Try loading with different parameters
+                    const embedUrl = `https://www.youtube-nocookie.com/embed/${actualVideo.id}?autoplay=1&rel=0&modestbranding=1`;
+                    console.log('Loading video:', actualVideo.id, embedUrl);
+                    player.src = embedUrl;
                     player.classList.add('active');
                     thumbnail.style.display = 'none';
                     overlay.style.display = 'none';
+                    
+                    // Add error handling
+                    player.onerror = function() {
+                        console.error('Failed to load video iframe');
+                        alert('This video cannot be embedded. YouTube may have disabled embedding for this video.');
+                        player.classList.remove('active');
+                        thumbnail.style.display = 'block';
+                        overlay.style.display = 'flex';
+                    };
                 }
             }
         }
