@@ -377,8 +377,8 @@
             }
 
             videoFeed.innerHTML = videosToRender.map((video, index) => `
-                <div class="video-card" data-index="${index}">
-                    <div class="video-thumbnail-container" onclick="togglePlayer(${index})">
+                <div class="video-card" data-index="${index}" data-video-id="${video.id}">
+                    <div class="video-thumbnail-container" onclick="window.togglePlayer(${index})">
                         <img class="video-thumbnail" 
                              src="https://img.youtube.com/vi/${video.id}/maxresdefault.jpg" 
                              alt="${video.title}"
@@ -390,7 +390,7 @@
                                 id="player-${index}"
                                 src="" 
                                 frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                 allowfullscreen>
                         </iframe>
                     </div>
@@ -398,7 +398,7 @@
                         <div class="video-title">${video.title}</div>
                         <div class="video-meta">
                             ${video.category ? `<span class="video-category">${video.category}</span>` : '<span></span>'}
-                            <button class="delete-button" onclick="deleteVideo(${index})">Delete</button>
+                            <button class="delete-button" onclick="window.deleteVideo(${index})">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -406,22 +406,26 @@
         }
 
         // Toggle video player
-        function togglePlayer(index) {
+        window.togglePlayer = function(index) {
             const player = document.getElementById(`player-${index}`);
             const card = player.closest('.video-card');
             const thumbnail = card.querySelector('.video-thumbnail');
             const overlay = card.querySelector('.play-overlay');
             
-            if (!player.src) {
-                player.src = `https://www.youtube.com/embed/${videos[index].id}?autoplay=1`;
-                player.classList.add('active');
-                thumbnail.style.display = 'none';
-                overlay.style.display = 'none';
+            if (!player.src || player.src === '') {
+                // Find the actual video in current rendered list
+                const actualVideo = videos.find(v => v.id === card.dataset.videoId);
+                if (actualVideo) {
+                    player.src = `https://www.youtube.com/embed/${actualVideo.id}?autoplay=1&enablejsapi=1`;
+                    player.classList.add('active');
+                    thumbnail.style.display = 'none';
+                    overlay.style.display = 'none';
+                }
             }
         }
 
         // Delete video
-        function deleteVideo(index) {
+        window.deleteVideo = function(index) {
             if (confirm('Are you sure you want to delete this video?')) {
                 videos.splice(index, 1);
                 localStorage.setItem('videos', JSON.stringify(videos));
