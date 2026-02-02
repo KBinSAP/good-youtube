@@ -1,5 +1,6 @@
 const CACHE_NAME = 'video-collection-v1';
 const urlsToCache = [
+  '/test-embed.html',
   '/youtube-collection.html',
   '/manifest.json'
 ];
