@@ -5,6 +5,16 @@
   ],
   "videos": [
     {
+      "id": "IdwTLmJ0ojg",
+      "title": "3 Money LIES That Will Keep You POOR in 2026! | Ankur Warikoo Hindi",
+      "description": "Finance advice",
+      "tags": [
+        "Finance"
+      ],
+      "profile": "Ki",
+      "addedAt": "2026-02-05T10:00:57.185Z"
+    },
+    {
       "id": "_zfN9wnPvU0",
       "title": "AI Slop Is Destroying The Internet",
       "description": "",
@@ -25,5 +35,5 @@
       "addedAt": "2026-02-05T09:57:38.187Z"
     }
   ],
-  "sha": "7e7c4ecf4eb6726432c47674ea5d5863acc74d6e"
+  "sha": "ab79aa97cc51532b8701b00ca3fcd4aa1897aca2"
 }
