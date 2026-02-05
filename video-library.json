@@ -4,6 +4,16 @@
   ],
   "videos": [
     {
+      "id": "rQqDwUZt8II",
+      "title": "AI probably can't do your job yet. But it might get you fired anyway",
+      "description": "Could be fear mongering",
+      "tags": [
+        "AI"
+      ],
+      "profile": "Brain Fodder",
+      "addedAt": "2026-02-05T06:45:48.405Z"
+    },
+    {
       "id": "cxo3KUteV_Y",
       "title": "Drone Downed, Tanker Harassed: Will Iran-US Talks Be Derailed? | Vantage with Palki Sharma | N18G",
       "description": "5.2.26 - Vantage",
@@ -14,5 +24,5 @@
       "addedAt": "2026-02-05T06:45:04.521Z"
     }
   ],
-  "sha": "f6d9097085b6b9bae3fe78c4bb7f1b98e9dc9c6d"
+  "sha": "24151e63c29d181d8788dd3d35acd51a16c75c80"
 }
