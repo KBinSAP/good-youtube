@@ -1,7 +1,7 @@
 {
-  "name": "My Video Collection",
-  "short_name": "Videos",
-  "description": "Personal YouTube video collection",
+  "name": "Ki's Tube",
+  "short_name": "Good Youtube",
+  "description": "Ki's YouTube video collection",
   "start_url": "/youtube-collection.html",
   "display": "standalone",
   "background_color": "#0f0f0f",
