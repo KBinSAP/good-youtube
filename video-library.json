@@ -4,6 +4,16 @@
   ],
   "videos": [
     {
+      "id": "CjyvBCiEFOs",
+      "title": "Anthrophic's New Claude Tools Spark Rout in IT Stocks | Vantage with Palki Sharma",
+      "description": "Test",
+      "tags": [
+        "Test"
+      ],
+      "profile": "Brain Fodder",
+      "addedAt": "2026-02-05T09:05:58.808Z"
+    },
+    {
       "id": "rQqDwUZt8II",
       "title": "AI probably can't do your job yet. But it might get you fired anyway",
       "description": "Could be fear mongering",
@@ -24,5 +34,5 @@
       "addedAt": "2026-02-05T06:45:04.521Z"
     }
   ],
-  "sha": "24151e63c29d181d8788dd3d35acd51a16c75c80"
+  "sha": "87440c9e2077cdc69c6f45128d2a14f6ebec1728"
 }
