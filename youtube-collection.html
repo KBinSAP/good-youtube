@@ -1090,7 +1090,7 @@
 
         // Service Worker registration
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {
+            navigator.serviceWorker.register('/good-youtube/sw.js').catch(() => {
                 console.log('Service Worker registration failed');
             });
         }
