@@ -1,8 +1,7 @@
 {
   "profiles": [
     "Shaan",
-    "Ki",
-    "test"
+    "Ki"
   ],
   "videos": [
     {
@@ -36,5 +35,5 @@
       "addedAt": "2026-02-05T09:57:38.187Z"
     }
   ],
-  "sha": "4bedfe912c80f967c156e4c3dcb3a3ff4df48374"
+  "sha": "fb64cfc121ad37bcb4a8ef3741b18f866194b1bd"
 }
