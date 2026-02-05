@@ -3,15 +3,6 @@
     "Music",
     "Brain Fodder"
   ],
-  "videos": [
-    {
-      "id": "search_quer",
-      "title": "YouTube Video",
-      "description": "",
-      "tags": [],
-      "profile": "Music",
-      "addedAt": "2026-02-05T06:17:05.361Z"
-    }
-  ],
-  "sha": "a48053c8315cdbd265670640b943a02831886a2b"
+  "videos": [],
+  "sha": "302e5016a1234cf3391a26fd9d2878c553c79a56"
 }
