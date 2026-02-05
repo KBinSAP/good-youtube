@@ -438,7 +438,20 @@
 <body>
     <div class="header">
         <div class="header-top">
-            <h1>KiTube</h1>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <h1>KiTube</h1>
+              <select id="quickProfileSwitch" 
+                style="
+                  background:#2a2a2a;
+                  border:1px solid #404040;
+                  color:#fff;
+                  border-radius:6px;
+                  padding:4px 8px;
+                  font-size:12px;
+                  cursor:pointer;
+                ">
+              </select>
+            </div>
             <div class="header-buttons">
                 <button class="profile-button" id="signInHeaderButton" style="display: none;">
                     Auth, pls!
@@ -641,6 +654,19 @@
         const newProfileNameInput = document.getElementById("newProfileName");
         const confirmAddProfile = document.getElementById("confirmAddProfile");
         const closeAddProfile = document.getElementById("closeAddProfile");
+        const quickProfileSwitch = document.getElementById("quickProfileSwitch");
+        
+        function renderQuickProfileSwitcher() {
+          if (!quickProfileSwitch) return;
+        
+          quickProfileSwitch.innerHTML = videoData.profiles.map(p => 
+            `<option value="${p}" ${p === activeProfile ? "selected" : ""}>${p}</option>`
+          ).join('');
+        }
+        
+        quickProfileSwitch.addEventListener("change", () => {
+          setActiveProfile(quickProfileSwitch.value);
+        });
         
         confirmAddProfile.addEventListener("click", async () => {
           const raw = newProfileNameInput.value.trim();
@@ -724,6 +750,37 @@
                 signOut();
             }
         }
+        function normalizeProfiles() {
+          // Ensure Default exists and is first
+          const lower = videoData.profiles.map(p => p.toLowerCase());
+          if (!lower.includes("default")) {
+            videoData.profiles.unshift("Default");
+          }
+        
+          // Remove duplicates (case-insensitive)
+          videoData.profiles = Array.from(
+            new Map(videoData.profiles.map(p => [p.toLowerCase(), p])).values()
+          );
+        
+          // Move Default to index 0
+          const idx = videoData.profiles.findIndex(p => p.toLowerCase() === "default");
+          if (idx > 0) {
+            const [def] = videoData.profiles.splice(idx, 1);
+            videoData.profiles.unshift(def);
+          }
+        
+          // Normalize video.profile references
+          videoData.videos.forEach(v => {
+            const match = videoData.profiles.find(p => p.toLowerCase() === v.profile.toLowerCase());
+            if (match) v.profile = match;
+          });
+        
+          // Ensure activeProfile is valid
+          if (!videoData.profiles.includes(activeProfile)) {
+            activeProfile = videoData.profiles[0];
+            localStorage.setItem("activeProfile", activeProfile);
+          }
+        }
 
         async function loadVideoData() {
             updateSyncStatus('syncing', 'Loading...');
@@ -755,8 +812,11 @@
                 updateProfileSelect();
                 renderProfilesList();
                 updateProfileSelect();
+                normalizeProfiles();
+                renderProfilesList();
+                updateProfileSelect();
                 updateSyncStatus('synced', 'Synced');
-
+                renderQuickProfileSwitcher();
                 // Deduplicate profiles (case-insensitive)
                 videoData.profiles = Array.from(
                   new Map(videoData.profiles.map(p => [p.toLowerCase(), p])).values()
@@ -984,12 +1044,17 @@
           const profilesList = document.getElementById('profilesList');
           if (!profilesList) return;
         
-          profilesList.innerHTML = videoData.profiles.map(profile => {
+          profilesList.innerHTML = videoData.profiles.map((profile, index) => {
             const count = videoData.videos.filter(v => v.profile === profile).length;
             const isActive = profile === activeProfile;
+            const isPinned = index === 0; // Default pinned
         
             return `
               <div 
+                class="profile-item ${isActive ? "active" : ""}"
+                draggable="${!isPinned}"
+                data-profile="${profile}"
+                data-index="${index}"
                 onclick="setActiveProfile('${profile}')"
                 style="
                   display:flex;
@@ -1001,29 +1066,81 @@
                   border-radius:8px;
                   margin-bottom:8px;
                   cursor:pointer;
+                  opacity:${isPinned ? 0.7 : 1};
                 "
               >
                 <div>
-                  <div style="font-size:14px;font-weight:500;">${profile}</div>
+                  <div style="font-size:14px;font-weight:500;">
+                    ${profile} ${isPinned ? '<span style="font-size:11px;color:#888;">(Default)</span>' : ''}
+                  </div>
                   <div style="font-size:12px;color:#888;">${count} videos</div>
                 </div>
-                ${videoData.profiles.length > 1 ? `
-                  <button 
-                    onclick="deleteProfile('${profile}'); event.stopPropagation();" 
-                    style="background:none;border:none;color:#ff4444;cursor:pointer;font-size:18px;padding:4px 8px;">
-                    ×
-                  </button>
-                ` : ''}
+        
+                <div style="display:flex;gap:6px;align-items:center;">
+                  ${!isPinned ? '<span style="cursor:grab;color:#888;">≡</span>' : ''}
+                  ${videoData.profiles.length > 1 && !isPinned ? `
+                    <button onclick="deleteProfile('${profile}'); event.stopPropagation()" 
+                      style="background:none;border:none;color:#ff4444;font-size:18px;cursor:pointer;">
+                      ×
+                    </button>
+                  ` : ''}
+                </div>
               </div>
             `;
           }).join('');
+        
+          attachProfileDragAndDrop();
+          renderQuickProfileSwitcher();
         }
+
+        function attachProfileDragAndDrop() {
+          const items = document.querySelectorAll(".profile-item");
+          let dragIndex = null;
+        
+          items.forEach(item => {
+            if (item.getAttribute("draggable") !== "true") return;
+        
+            item.addEventListener("dragstart", e => {
+              dragIndex = Number(item.dataset.index);
+              e.dataTransfer.effectAllowed = "move";
+            });
+        
+            item.addEventListener("dragover", e => {
+              e.preventDefault();
+              item.style.background = "#333";
+            });
+        
+            item.addEventListener("dragleave", () => {
+              item.style.background = "";
+            });
+        
+            item.addEventListener("drop", async e => {
+              e.preventDefault();
+              const targetIndex = Number(item.dataset.index);
+              item.style.background = "";
+        
+              // Prevent moving above Default
+              if (targetIndex === 0 || dragIndex === 0) return;
+        
+              const moved = videoData.profiles.splice(dragIndex, 1)[0];
+              videoData.profiles.splice(targetIndex, 0, moved);
+        
+              normalizeProfiles();
+              await saveVideoData();
+              renderProfilesList();
+              updateProfileSelect();
+            });
+          });
+        }
+
         function setActiveProfile(profile) {
           activeProfile = profile;
           localStorage.setItem("activeProfile", profile);
           renderProfilesList();
           renderVideos();
+          renderQuickProfileSwitcher();
         }
+
         window.setActiveProfile = setActiveProfile;
 
         async function addNewProfile() {
