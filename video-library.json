@@ -1,6 +1,7 @@
 {
   "profiles": [
-    "default"
+    "default",
+    "Music"
   ],
   "videos": [
     {
@@ -14,5 +15,5 @@
       "addedAt": "2026-02-05T06:08:08.527Z"
     }
   ],
-  "sha": "bebbaccf6d454e11e85b26826ef055120f98ea4d"
+  "sha": "64ef2ae86d2d92a0775b849288db000980dc6dac"
 }
