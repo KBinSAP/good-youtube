@@ -1139,6 +1139,9 @@
           renderProfilesList();
           renderVideos();
           renderQuickProfileSwitcher();
+          if (settingsModal.classList.contains("active")) {
+            settingsModal.classList.remove("active");
+          }
         }
 
         window.setActiveProfile = setActiveProfile;
