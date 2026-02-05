@@ -440,17 +440,10 @@
         <div class="header-top">
             <div style="display:flex;align-items:center;gap:10px;">
               <h1>KiTube</h1>
-              <select id="quickProfileSwitch" 
-                style="
-                  background:#2a2a2a;
-                  border:1px solid #404040;
-                  color:#fff;
-                  border-radius:6px;
-                  padding:4px 8px;
-                  font-size:12px;
-                  cursor:pointer;
-                ">
-              </select>
+              <button id="profileSwitcher" class="profile-button">
+                <span id="activeProfileLabel">Default</span>
+                <span style="opacity:0.7;">▾</span>
+              </button>
             </div>
             <div class="header-buttons">
                 <button class="profile-button" id="signInHeaderButton" style="display: none;">
@@ -464,6 +457,15 @@
                     <span id="userNameHeader"></span>
                     <span style="margin-left: 4px;">⚙️</span>
                 </button>
+            </div>
+            <div id="profileDropdown" class="modal">
+              <div class="modal-content" style="max-width:360px;">
+                <div class="modal-header">
+                  <h2>Switch Profile</h2>
+                  <button class="close-button" id="closeProfileDropdown">×</button>
+                </div>
+                <div id="profileDropdownList"></div>
+              </div>
             </div>
         </div>
         <input type="text" class="search-bar" id="searchInput" placeholder="Search by title, description, or tags...">
@@ -655,7 +657,38 @@
         const confirmAddProfile = document.getElementById("confirmAddProfile");
         const closeAddProfile = document.getElementById("closeAddProfile");
         const quickProfileSwitch = document.getElementById("quickProfileSwitch");
+        const profileSwitcher = document.getElementById("profileSwitcher");
+        const profileDropdown = document.getElementById("profileDropdown");
+        const closeProfileDropdown = document.getElementById("closeProfileDropdown");
+        const profileDropdownList = document.getElementById("profileDropdownList");
+        const activeProfileLabel = document.getElementById("activeProfileLabel");
         
+        profileSwitcher.addEventListener("click", () => {
+          profileDropdown.classList.add("active");
+        });
+        
+        closeProfileDropdown.addEventListener("click", () => {
+          profileDropdown.classList.remove("active");
+        });
+        
+        function renderProfileDropdown() {
+          profileDropdownList.innerHTML = videoData.profiles.map(p => `
+            <div 
+              onclick="setActiveProfile('${p}')"
+              style="
+                padding:12px;
+                border-radius:8px;
+                margin-bottom:6px;
+                cursor:pointer;
+                background:${p === activeProfile ? '#1f2a36' : '#2a2a2a'};
+                border:${p === activeProfile ? '2px solid #3ea6ff' : '1px solid #333'};
+              "
+            >
+              ${p} ${p === activeProfile ? "✓" : ""}
+            </div>
+          `).join('');
+        }
+
         function renderQuickProfileSwitcher() {
           if (!quickProfileSwitch) return;
         
@@ -816,7 +849,9 @@
                 renderProfilesList();
                 updateProfileSelect();
                 updateSyncStatus('synced', 'Synced');
-                renderQuickProfileSwitcher();
+                renderProfileDropdown();
+                activeProfileLabel.textContent = activeProfile;
+
                 // Deduplicate profiles (case-insensitive)
                 videoData.profiles = Array.from(
                   new Map(videoData.profiles.map(p => [p.toLowerCase(), p])).values()
@@ -1136,14 +1171,17 @@
         function setActiveProfile(profile) {
           activeProfile = profile;
           localStorage.setItem("activeProfile", profile);
+        
           renderProfilesList();
           renderVideos();
-          renderQuickProfileSwitcher();
-          if (settingsModal.classList.contains("active")) {
-            settingsModal.classList.remove("active");
-          }
+          renderProfileDropdown();
+        
+          activeProfileLabel.textContent = profile;
+        
+          // Close both modals if open
+          settingsModal.classList.remove("active");
+          profileDropdown.classList.remove("active");
         }
-
         window.setActiveProfile = setActiveProfile;
 
         async function addNewProfile() {
