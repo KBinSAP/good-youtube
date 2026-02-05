@@ -581,6 +581,31 @@
             </div>
         </div>
     </div>
+    <!-- Add Profile Modal -->
+    <div class="modal" id="addProfileModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>New Profile</h2>
+          <button class="close-button" id="closeAddProfile">×</button>
+        </div>
+    
+        <div class="form-group">
+          <label for="newProfileName">Profile name</label>
+          <input 
+            id="newProfileName" 
+            placeholder="e.g. Learning, Music, Finance"
+            maxlength="24"
+            autocomplete="off"
+          />
+          <small>Short, descriptive name</small>
+        </div>
+    
+        <button class="submit-button" id="confirmAddProfile">
+          Add Profile
+        </button>
+      </div>
+    </div>
+
 
     <script>
         // GitHub Configuration
@@ -611,6 +636,37 @@
         const addProfileButton = document.getElementById('addProfileButton');
         const syncStatus = document.getElementById('syncStatus');
         const syncStatusText = document.getElementById('syncStatusText');
+
+        const addProfileModal = document.getElementById("addProfileModal");
+        const newProfileNameInput = document.getElementById("newProfileName");
+        const confirmAddProfile = document.getElementById("confirmAddProfile");
+        const closeAddProfile = document.getElementById("closeAddProfile");
+        
+        confirmAddProfile.addEventListener("click", async () => {
+          const raw = newProfileNameInput.value.trim();
+          if (!raw) return alert("Profile name cannot be empty");
+        
+          const normalized = raw.toLowerCase();
+          const existing = videoData.profiles.map(p => p.toLowerCase());
+        
+          if (existing.includes(normalized)) {
+            alert("Profile already exists");
+            return;
+          }
+        
+          videoData.profiles.push(raw);
+          await saveVideoData();
+        
+          newProfileNameInput.value = "";
+          addProfileModal.classList.remove("active");
+        
+          renderProfilesList();
+          updateProfileSelect();
+        });
+        
+        closeAddProfile.addEventListener("click", () => {
+          addProfileModal.classList.remove("active");
+        });
 
         // ============================================
         // GITHUB API
@@ -700,6 +756,17 @@
                 renderProfilesList();
                 updateProfileSelect();
                 updateSyncStatus('synced', 'Synced');
+
+                // Deduplicate profiles (case-insensitive)
+                videoData.profiles = Array.from(
+                  new Map(videoData.profiles.map(p => [p.toLowerCase(), p])).values()
+                );
+                
+                // Normalize video.profile references
+                videoData.videos.forEach(v => {
+                  const match = videoData.profiles.find(p => p.toLowerCase() === v.profile.toLowerCase());
+                  if (match) v.profile = match;
+                });
             } catch (error) {
                 console.error('Error loading video data:', error);
                 updateSyncStatus('error', 'Load failed');
@@ -960,7 +1027,7 @@
         window.setActiveProfile = setActiveProfile;
 
         async function addNewProfile() {
-          const profileName = prompt('Enter new profile name:');
+          document.getElementById("addProfileModal").classList.add("active");
           if (!profileName || !profileName.trim()) return;
         
           const trimmedName = profileName.trim();
