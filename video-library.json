@@ -5,6 +5,16 @@
   ],
   "videos": [
     {
+      "id": "_zfN9wnPvU0",
+      "title": "AI Slop Is Destroying The Internet",
+      "description": "",
+      "tags": [
+        "education"
+      ],
+      "profile": "Shaan",
+      "addedAt": "2026-02-05T09:59:58.581Z"
+    },
+    {
       "id": "2OtF5c6T25w",
       "title": "Something More - Gabriela Bee (Official Lyric Video)",
       "description": "Gabrielle",
@@ -15,5 +25,5 @@
       "addedAt": "2026-02-05T09:57:38.187Z"
     }
   ],
-  "sha": "bfa816e4341354b036d92e384297b3cc2ea6e940"
+  "sha": "7e7c4ecf4eb6726432c47674ea5d5863acc74d6e"
 }
