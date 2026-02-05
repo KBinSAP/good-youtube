@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a1a">
-    <link rel="apple-touch-icon" sizes="180x180" href="/good-youtube//icons/kitube.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/good-youtube/icons/kitube.png">
     <title>KiTube</title>
     <link rel="manifest" href="/good-youtube/manifest.json">
     <style>
@@ -593,6 +593,7 @@
         let userData = null;
         let videoData = { profiles: ['default'], videos: [] };
         let currentFilter = null;
+        let activeProfile = localStorage.getItem("activeProfile") || "default";
 
         // DOM Elements
         const addButton = document.getElementById('addButton');
@@ -695,6 +696,8 @@
                 }
                 
                 renderVideos();
+                updateProfileSelect();
+                renderProfilesList();
                 updateProfileSelect();
                 updateSyncStatus('synced', 'Synced');
             } catch (error) {
@@ -800,7 +803,7 @@
         }
 
         function renderVideos() {
-            let videosToRender = videoData.videos || [];
+            let videosToRender = (videoData.videos || []).filter(v => v.profile === activeProfile);
             
             // Apply search filter
             const searchTerm = searchInput.value.toLowerCase();
@@ -911,40 +914,69 @@
         }
 
         function renderProfilesList() {
-            const profilesList = document.getElementById('profilesList');
-            if (!profilesList) return;
-            
-            profilesList.innerHTML = videoData.profiles.map(profile => {
-                const count = videoData.videos.filter(v => v.profile === profile).length;
-                return `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #2a2a2a; border-radius: 8px; margin-bottom: 8px;">
-                        <div>
-                            <div style="font-size: 14px; font-weight: 500;">${profile}</div>
-                            <div style="font-size: 12px; color: #888;">${count} videos</div>
-                        </div>
-                        ${videoData.profiles.length > 1 ? `
-                            <button onclick="deleteProfile('${profile}')" style="background: none; border: none; color: #ff4444; cursor: pointer; font-size: 18px; padding: 4px 8px;">×</button>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
+          const profilesList = document.getElementById('profilesList');
+          if (!profilesList) return;
+        
+          profilesList.innerHTML = videoData.profiles.map(profile => {
+            const count = videoData.videos.filter(v => v.profile === profile).length;
+            const isActive = profile === activeProfile;
+        
+            return `
+              <div 
+                onclick="setActiveProfile('${profile}')"
+                style="
+                  display:flex;
+                  justify-content:space-between;
+                  align-items:center;
+                  padding:10px;
+                  background:${isActive ? '#1f2a36' : '#2a2a2a'};
+                  border:${isActive ? '2px solid #3ea6ff' : '1px solid #333'};
+                  border-radius:8px;
+                  margin-bottom:8px;
+                  cursor:pointer;
+                "
+              >
+                <div>
+                  <div style="font-size:14px;font-weight:500;">${profile}</div>
+                  <div style="font-size:12px;color:#888;">${count} videos</div>
+                </div>
+                ${videoData.profiles.length > 1 ? `
+                  <button 
+                    onclick="deleteProfile('${profile}'); event.stopPropagation();" 
+                    style="background:none;border:none;color:#ff4444;cursor:pointer;font-size:18px;padding:4px 8px;">
+                    ×
+                  </button>
+                ` : ''}
+              </div>
+            `;
+          }).join('');
         }
+        function setActiveProfile(profile) {
+          activeProfile = profile;
+          localStorage.setItem("activeProfile", profile);
+          renderProfilesList();
+          renderVideos();
+        }
+        window.setActiveProfile = setActiveProfile;
 
         async function addNewProfile() {
-            const profileName = prompt('Enter new profile name:');
-            if (!profileName || !profileName.trim()) return;
-            
-            const trimmedName = profileName.trim();
-            
-            if (videoData.profiles.includes(trimmedName)) {
-                alert('Profile already exists!');
-                return;
-            }
-            
-            videoData.profiles.push(trimmedName);
-            await saveVideoData();
-            updateProfileSelect();
-            renderProfilesList();
+          const profileName = prompt('Enter new profile name:');
+          if (!profileName || !profileName.trim()) return;
+        
+          const trimmedName = profileName.trim();
+          const exists = videoData.profiles
+            .map(p => p.toLowerCase())
+            .includes(trimmedName.toLowerCase());
+        
+          if (exists) {
+            alert('Profile already exists!');
+            return;
+          }
+        
+          videoData.profiles.push(trimmedName);
+          await saveVideoData();
+          updateProfileSelect();
+          renderProfilesList();
         }
 
         async function deleteProfile(profileName) {
@@ -1077,15 +1109,16 @@
         // ============================================
         
         async function init() {
-            // Load data if already authenticated
-            if (accessToken) {
-                await loadUserData();
-                await loadVideoData();
-            } else {
-                updateUI();
-            }
+          if (accessToken) {
+            await loadUserData();
+            await loadVideoData();
+            renderProfilesList();
+            updateProfileSelect();
+          } else {
+            updateUI();
+          }
         }
-
+        
         init();
 
         // Service Worker registration
