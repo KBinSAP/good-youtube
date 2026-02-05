@@ -1,7 +1,8 @@
 {
   "profiles": [
     "Music",
-    "Brain Fodder"
+    "Brain Fodder",
+    "Test"
   ],
   "videos": [
     {
@@ -15,5 +16,5 @@
       "addedAt": "2026-02-05T06:17:30.651Z"
     }
   ],
-  "sha": "a78c8d37be66d30e95d5741d2b6c2c34f7f28333"
+  "sha": "3913ec67ce955142ca9faccc5ef6f4a9be64f9c5"
 }
