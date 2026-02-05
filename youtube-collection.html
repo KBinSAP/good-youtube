@@ -437,11 +437,11 @@
             <h1>Ki's Tube</h1>
             <div class="header-buttons">
                 <button class="profile-button" id="signInHeaderButton" style="display: none;">
-                    Auth, pls
+                    Auth, pls!
                 </button>
                 <div class="sync-status" id="syncStatus" style="display: none;">
                     <div class="sync-indicator"></div>
-                    <span id="syncStatusText">Who are you?</span>
+                    <span id="syncStatusText">Not signed in</span>
                 </div>
                 <button class="auth-button-header" id="authButtonHeader" style="display: none;">
                     <span id="userNameHeader"></span>
@@ -508,7 +508,7 @@
 
             <div id="notSignedIn">
                 <div class="info-box">
-                    <strong>🔒 Connect to GitHub</strong>
+                    <strong>Connect to GitHub</strong>
                     Your videos will be stored in a JSON file in your GitHub repository. This means:
                     <ul style="margin-top: 10px; padding-left: 20px;">
                         <li>You own your data completely</li>
@@ -553,7 +553,7 @@
                         </div>
                     </div>
                     <button class="submit-button" style="background: #2a2a2a;" id="signOutButton">
-                        Sign Out
+                        Bubye!
                     </button>
                 </div>
 
@@ -603,6 +603,7 @@
         const closeSettings = document.getElementById('closeSettings');
         const connectButton = document.getElementById('connectButton');
         const signOutButton = document.getElementById('signOutButton');
+        const addProfileButton = document.getElementById('addProfileButton');
         const syncStatus = document.getElementById('syncStatus');
         const syncStatusText = document.getElementById('syncStatusText');
 
@@ -811,7 +812,7 @@
                 videoFeed.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📹</div>
-                        <p>${accessToken ? 'No videos yet. Click the + button to add your first video!' : 'Sign in with GitHub to start building your video collection!'}</p>
+                        <p>${accessToken ? 'No videos yet. Click the + button to add your first video!' : 'Sign in to start building your video collection!'}</p>
                     </div>
                 `;
                 return;
@@ -905,6 +906,68 @@
             ).join('');
         }
 
+        function renderProfilesList() {
+            const profilesList = document.getElementById('profilesList');
+            if (!profilesList) return;
+            
+            profilesList.innerHTML = videoData.profiles.map(profile => {
+                const count = videoData.videos.filter(v => v.profile === profile).length;
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #2a2a2a; border-radius: 8px; margin-bottom: 8px;">
+                        <div>
+                            <div style="font-size: 14px; font-weight: 500;">${profile}</div>
+                            <div style="font-size: 12px; color: #888;">${count} videos</div>
+                        </div>
+                        ${videoData.profiles.length > 1 ? `
+                            <button onclick="deleteProfile('${profile}')" style="background: none; border: none; color: #ff4444; cursor: pointer; font-size: 18px; padding: 4px 8px;">×</button>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function addNewProfile() {
+            const profileName = prompt('Enter new profile name:');
+            if (!profileName || !profileName.trim()) return;
+            
+            const trimmedName = profileName.trim();
+            
+            if (videoData.profiles.includes(trimmedName)) {
+                alert('Profile already exists!');
+                return;
+            }
+            
+            videoData.profiles.push(trimmedName);
+            await saveVideoData();
+            updateProfileSelect();
+            renderProfilesList();
+        }
+
+        async function deleteProfile(profileName) {
+            if (videoData.profiles.length === 1) {
+                alert('Cannot delete the last profile!');
+                return;
+            }
+            
+            const videosInProfile = videoData.videos.filter(v => v.profile === profileName).length;
+            const confirmMsg = videosInProfile > 0 
+                ? `Delete profile "${profileName}" and its ${videosInProfile} video(s)?`
+                : `Delete profile "${profileName}"?`;
+            
+            if (!confirm(confirmMsg)) return;
+            
+            videoData.profiles = videoData.profiles.filter(p => p !== profileName);
+            videoData.videos = videoData.videos.filter(v => v.profile !== profileName);
+            
+            await saveVideoData();
+            updateProfileSelect();
+            renderProfilesList();
+            renderVideos();
+        }
+        
+        // Make deleteProfile accessible globally for onclick handler
+        window.deleteProfile = deleteProfile;
+
         // ============================================
         // UI UPDATES
         // ============================================
@@ -924,6 +987,8 @@
                 document.getElementById('userAvatar').src = userData.avatar_url;
                 document.getElementById('repoPath').textContent = `${REPO_OWNER}/${REPO_NAME}/${DATA_FILE}`;
                 document.getElementById('viewOnGitHub').href = `https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/main/${DATA_FILE}`;
+                
+                renderProfilesList();
             } else {
                 addButton.style.display = 'none';
                 authButtonHeader.style.display = 'none';
@@ -944,6 +1009,7 @@
             settingsModal.classList.add('active');
         });
         signOutButton.addEventListener('click', signOut);
+        addProfileButton.addEventListener('click', addNewProfile);
         
         authButtonHeader.addEventListener('click', () => {
             settingsModal.classList.add('active');
