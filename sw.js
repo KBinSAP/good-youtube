@@ -1,7 +1,8 @@
 const CACHE_NAME = 'video-collection-v1';
 const urlsToCache = [
-  '/youtube-collection.html',
-  '/manifest.json'
+  '/good-youtube/',
+  '/good-youtube/youtube-collection.html',
+  '/good-youtube/manifest.json'
 ];
 
 self.addEventListener('install', event => {
