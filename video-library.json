@@ -6,6 +6,16 @@
   ],
   "videos": [
     {
+      "id": "Eu29v5jPVMU",
+      "title": "The mindset that is slowly destroying your life",
+      "description": "",
+      "tags": [
+        "Productivity"
+      ],
+      "profile": "Ki",
+      "addedAt": "2026-02-06T12:40:57.974Z"
+    },
+    {
       "id": "IdwTLmJ0ojg",
       "title": "3 Money LIES That Will Keep You POOR in 2026! | Ankur Warikoo Hindi",
       "description": "Finance advice",
@@ -36,5 +46,5 @@
       "addedAt": "2026-02-05T09:57:38.187Z"
     }
   ],
-  "sha": "3c18aa3eeeec6d075096bc472c37355723291ae1"
+  "sha": "d0b75614812ab1c93d01cf94f24a9a3df8be4a43"
 }
