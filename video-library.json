@@ -6,6 +6,16 @@
   ],
   "videos": [
     {
+      "id": "IM7WOni8-A4",
+      "title": "Declutter Your Home in Just 5 Minutes a Day | Simple Tips for A Clutter Free Home",
+      "description": "",
+      "tags": [
+        "Home making"
+      ],
+      "profile": "Ki",
+      "addedAt": "2026-02-07T07:28:57.058Z"
+    },
+    {
       "id": "Eu29v5jPVMU",
       "title": "The mindset that is slowly destroying your life",
       "description": "",
@@ -46,5 +56,5 @@
       "addedAt": "2026-02-05T09:57:38.187Z"
     }
   ],
-  "sha": "c65f71bd01fb52f0c1904b17ae810f39ff150e12"
+  "sha": "106a183125fd061e72a22d709d472fce7883d4bb"
 }
