@@ -6,6 +6,16 @@
   ],
   "videos": [
     {
+      "id": "gGhzG-x-Nks",
+      "title": "LIVE: Claude CoWork Breakthrough Triggers Sell-Off in Indian Tech | Vantage with Palki Sharma | N18G",
+      "description": "Vantage",
+      "tags": [
+        "News"
+      ],
+      "profile": "Ki",
+      "addedAt": "2026-02-07T07:29:29.732Z"
+    },
+    {
       "id": "IM7WOni8-A4",
       "title": "Declutter Your Home in Just 5 Minutes a Day | Simple Tips for A Clutter Free Home",
       "description": "",
@@ -56,5 +66,5 @@
       "addedAt": "2026-02-05T09:57:38.187Z"
     }
   ],
-  "sha": "106a183125fd061e72a22d709d472fce7883d4bb"
+  "sha": "ce1a62ee2d339f4d9ea7586b2b0ef1a9b9bcbef8"
 }
